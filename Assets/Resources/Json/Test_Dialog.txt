@@ -1,0 +1,8 @@
+{
+	"dialogs":[
+		{"chrLabel":"Characters[Characters_0]","chrName":"阿倫","chrPos":"left","words":"喂，吃宵夜啦！[w]"},
+		{"chrLabel":"Characters[Characters_1]","chrName":"費斯","chrPos":"right","words":"好呀要吃什麼？[w]"},
+        {"chrLabel":"Characters[Characters_0]","chrName":"阿倫","chrPos":"left","words":"牛肉麵怎樣？[w]"},
+		{"chrLabel":"Characters[Characters_1]","chrName":"費斯","chrPos":"right","words":"走呀！[w]"}
+	]
+}
