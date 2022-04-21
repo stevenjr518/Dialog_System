@@ -11,7 +11,7 @@ public static class Dialog_Panel
         }
         GameObject obj = Object.Instantiate(Resources.Load<GameObject>("Dialog_Panel"), _canvas);
         Dialog_GameLoop dialog = obj.GetComponent<Dialog_GameLoop>();
-        dialog.canvas = _canvas;
-        dialog.storyLabel = _storyLabel;
+        dialog.TargetCanvas = _canvas;
+        dialog.StoryLabel = _storyLabel;
     }
 }

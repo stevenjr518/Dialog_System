@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Dialog_System;
+
 public class Dialog_GameLoop : MonoBehaviour
 {
+    #region Public Members
     [System.Serializable]
     public struct Dialog
     {
-        public string chrLabel;//image addressed label
+        public string chrLabel;//Image addressed label
         public string chrName;
-        public string chrPos;//mid, left, right
-        public string words;//words
+        public string chrPos;//mid, left and right
+        public string words;
     }
 
     public struct ChrImage
@@ -21,10 +23,16 @@ public class Dialog_GameLoop : MonoBehaviour
     }
 
     public static Dialog_GameLoop Instance;
-    public List<Dialog> dialogs = new List<Dialog>();
-    public List<ChrImage> chrImages = new List<ChrImage>();
-    public string storyLabel;
-    public RectTransform canvas;
+    public List<Dialog> Dialogs = new List<Dialog>();
+    public string StoryLabel;
+    public delegate void DialogEndMethod();
+    public static DialogEndMethod DialogEnd;
+    public RectTransform TargetCanvas;
+    public bool IsEnd;
+    #endregion
+
+    #region Private Members
+    private List<ChrImage> chrImages = new List<ChrImage>();
     private Text guiText;
     private Text chrNameText;
     private TextAsset textFile = null;
@@ -32,16 +40,13 @@ public class Dialog_GameLoop : MonoBehaviour
     private Button skipButton;
     private Dialog_Animation ani;
     private DialogSystem dialogSystem;
-    public delegate void DialogEnd();
-    public static DialogEnd dialogEnd;
     private float delay = 1.5f;
-    public bool isEnd;
+    #endregion
 
     private void Awake()
     {
         if (Instance != null) {
             DestroyImmediate(Instance.gameObject);
-            Instance = this;
         }
         Instance = this;
         animator = GetComponent<Animator>();
@@ -75,12 +80,12 @@ public class Dialog_GameLoop : MonoBehaviour
 
     void Start()
     {
-        if (storyLabel == "")
+        if (StoryLabel == "")
         {
-            storyLabel = "Test_Dialog";
+            StoryLabel = "Test_Dialog";
         }
-        guiText = UIGet.GetUIComponent<Text>(canvas.gameObject, "Dialog_Text");
-        LoadFile();
+        guiText = UIGet.GetUIComponent<Text>(TargetCanvas.gameObject, "Dialog_Text");
+        LoadTextFile();
         if(textFile == null)
         {
             Disappear();
@@ -90,9 +95,9 @@ public class Dialog_GameLoop : MonoBehaviour
         Invoke("StartStory", delay);
     }
 
-    private void LoadFile()
+    private void LoadTextFile()
     {
-        textFile = Resources.Load<TextAsset>("Json/" + storyLabel);
+        textFile = Resources.Load<TextAsset>("Json/" + StoryLabel);
         if (textFile == null)
         {
 #if UNITY_EDITOR
@@ -106,15 +111,15 @@ public class Dialog_GameLoop : MonoBehaviour
     public void NewStroy(string label)
     {
         if(label == "") { return; }
-        isEnd = false;
+        IsEnd = false;
         guiText.text = "";
         foreach(ChrImage chr in chrImages)
         {
             chr.image.sprite = null;
             chr.image.gameObject.SetActive(false);
         }
-        storyLabel = label;
-        LoadFile();
+        StoryLabel = label;
+        LoadTextFile();
         if (textFile == null)
         {
             Disappear();
@@ -140,7 +145,7 @@ public class Dialog_GameLoop : MonoBehaviour
 
     private IEnumerator StartDialog()
     {
-        foreach(Dialog dialog in dialogs)
+        foreach(Dialog dialog in Dialogs)
         {
             Sprite sp;
             if (dialog.chrLabel != "")
@@ -160,10 +165,10 @@ public class Dialog_GameLoop : MonoBehaviour
             SetSpeakChr(dialog.chrPos, sp, dialog.chrName);
             dialogSystem = new DialogSystem(dialog.words, guiText, this);
             StartCoroutine(dialogSystem.PrintTextContent());
-            yield return new WaitUntil(() => dialogSystem.isEnd == true);
-            dialogSystem.isEnd = false;
+            yield return new WaitUntil(() => dialogSystem.IsEnd == true);
+            dialogSystem.IsEnd = false;
         }
-        isEnd = true;
+        IsEnd = true;
         chrNameText.text = "";
         ani.Disappear();
     }
@@ -195,7 +200,7 @@ public class Dialog_GameLoop : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) {
-            dialogSystem.isWaiting = false;
+            dialogSystem.IsWaiting = false;
         }
     }
 
@@ -208,16 +213,16 @@ public class Dialog_GameLoop : MonoBehaviour
     public void Next() {
         if (dialogSystem != null)
         {
-            dialogSystem.isWaiting = false;
+            dialogSystem.IsWaiting = false;
         }
     }
 
     public void Disappear()
     {
-        storyLabel = "";
-        if (dialogEnd != null)
+        StoryLabel = "";
+        if (DialogEnd != null)
         {
-            dialogEnd();
+            DialogEnd();
         }
         else
         {

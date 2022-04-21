@@ -1,17 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Scene_Test : MonoBehaviour
 {
-
-    public RectTransform canvas;
-    public string storyLabel;
+    [SerializeField]
+    private RectTransform canvas;
+    [SerializeField]
+    private string storyLabel;
 
     private void Start()
     {
         Dialog_Panel.StartDialog(canvas, storyLabel);
-        Dialog_GameLoop.dialogEnd += End;
+        Dialog_GameLoop.DialogEnd += End;
     }
 
     private void Update()
@@ -24,11 +23,13 @@ public class Scene_Test : MonoBehaviour
 
     private void End()
     {
-        Debug.Log("End Move");
+#if UNITY_EDITOR
+        Debug.Log("Do things at the end");
+#endif
     }
 
     private void OnDestroy()
     {
-        Dialog_GameLoop.dialogEnd -= End;
+        Dialog_GameLoop.DialogEnd -= End;
     }
 }
