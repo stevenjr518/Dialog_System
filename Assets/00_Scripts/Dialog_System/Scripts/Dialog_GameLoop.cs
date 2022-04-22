@@ -43,7 +43,8 @@ public class Dialog_GameLoop : MonoBehaviour
     private float delay = 1.5f;
     #endregion
 
-    private void Awake()
+    #region MonoBehaviour Methods
+    void Awake()
     {
         if (Instance != null) {
             DestroyImmediate(Instance.gameObject);
@@ -95,6 +96,17 @@ public class Dialog_GameLoop : MonoBehaviour
         Invoke("StartStory", delay);
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            dialogSystem.IsWaiting = false;
+        }
+    }
+
+    #endregion
+
+    #region Public Methods
     private void LoadTextFile()
     {
         textFile = Resources.Load<TextAsset>("Json/" + StoryLabel);
@@ -142,6 +154,39 @@ public class Dialog_GameLoop : MonoBehaviour
             StartCoroutine(StartDialog());
         }
     }
+
+    public void Skip()
+    {
+        ani.Disappear();
+        chrNameText.text = "";
+    }
+
+    public void Next()
+    {
+        if (dialogSystem != null)
+        {
+            dialogSystem.IsWaiting = false;
+        }
+    }
+
+    public void Disappear()
+    {
+        StoryLabel = "";
+        if (DialogEnd != null)
+        {
+            DialogEnd();
+        }
+        else
+        {
+#if UNITY_EDITOR
+            Debug.Log("DialogEnd is null");
+#endif
+        }
+        gameObject.SetActive(false);
+    }
+    #endregion
+
+    #region Private Methods
 
     private IEnumerator StartDialog()
     {
@@ -196,40 +241,5 @@ public class Dialog_GameLoop : MonoBehaviour
             }
         }
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            dialogSystem.IsWaiting = false;
-        }
-    }
-
-    public void Skip()
-    {
-        ani.Disappear();
-        chrNameText.text = "";
-    }
-
-    public void Next() {
-        if (dialogSystem != null)
-        {
-            dialogSystem.IsWaiting = false;
-        }
-    }
-
-    public void Disappear()
-    {
-        StoryLabel = "";
-        if (DialogEnd != null)
-        {
-            DialogEnd();
-        }
-        else
-        {
-#if UNITY_EDITOR
-            Debug.Log("DialogEnd is null");
-#endif
-        }
-        gameObject.SetActive(false);
-    }
+    #endregion
 }
