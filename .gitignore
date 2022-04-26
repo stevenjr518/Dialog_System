@@ -36,3 +36,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 .DS_Store
+Logs/shadercompiler-AssetImportWorker0.log
